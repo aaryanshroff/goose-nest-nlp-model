@@ -1,9 +1,6 @@
 import cli.chatbot
 import logging
 
-# TODO: Set up better logging
-logging.basicConfig(filename="chatbot.log", level=logging.DEBUG)
-
 
 def test_make_exit():
     c = cli.chatbot.ChatBot()
@@ -24,7 +21,8 @@ def test_find_intent_match():
 
 
 def test_find_entities():
-    c = cli.chatbot.ChatBot()
+    c = cli.chatbot.ChatBot(categories=[
+        ("city", "NNP"), ("budget", "CD")])
 
     # TODO: Fix failing test
     # assert c.find_entities(

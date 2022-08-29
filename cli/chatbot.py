@@ -30,6 +30,7 @@ class ChatBot:
         """
         self.responses = responses or []
         # Categories of entities that the chatbot will extract from the user message.
+        # TODO: Limit POS tags to Penn tagset.
         self.categories = categories or []
 
     def __preprocess(self, msg: str) -> List[str]:
@@ -46,6 +47,7 @@ class ChatBot:
         """Return the similarity of the user message and the response."""
         return sum([bow_user_msg[token] for token in bow_user_msg if token in bow_response]) / len(bow_user_msg)
 
+    # TODO: Return a list of named tuples instead.
     def __compute_similarity(self, tokens: List[SpacyDoc], category: SpacyDoc) -> List[Tuple[str, float]]:
         """Return a list of similarities between the tokens and the category."""
         return [(token.text, token.similarity(category)) for token in tokens]
