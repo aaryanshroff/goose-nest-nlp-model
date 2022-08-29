@@ -10,15 +10,16 @@ from collections import Counter
 from nltk import pos_tag as nltk_pos_tag
 from nltk.tokenize import word_tokenize as nltk_word_tokenize
 from nltk.corpus import stopwords as nltk_stopwords
-from typing import List
+from typing import List, Tuple
 
 
 class ChatBot:
+    # Signals to the chatbot that the user wants to exit the conversation.
     exit_commands = ("quit", "pause", "exit", "goodbye", "bye", "later")
     stopwords = set(nltk_stopwords.words("english"))
     word2vec = spacy.load("en_core_web_sm")
 
-    def __init__(self, responses=None):
+    def __init__(self, responses=None, categories: List[Tuple[str, str]] = None):
         """Initialize the chatbot with a list of responses.
         >>> c1 = ChatBot()
         >>> c1.responses
@@ -28,6 +29,8 @@ class ChatBot:
         ['Hello!']
         """
         self.responses = responses or []
+        # Categories of entities that the chatbot will extract from the user message.
+        self.categories = categories or []
 
     def __preprocess(self, msg: str) -> List[str]:
         """Preprocess the message to remove punctuation and tokenize."""
@@ -43,9 +46,9 @@ class ChatBot:
         """Return the similarity of the user message and the response."""
         return sum([bow_user_msg[token] for token in bow_user_msg if token in bow_response]) / len(bow_user_msg)
 
-    def __compute_similarity(self, tokens: List[SpacyDoc], category: SpacyDoc) -> List[float]:
+    def __compute_similarity(self, tokens: List[SpacyDoc], category: SpacyDoc) -> List[Tuple[str, float]]:
         """Return a list of similarities between the tokens and the category."""
-        return [[token.text, category.text, token.similarity(category)] for token in tokens]
+        return [(token.text, token.similarity(category)) for token in tokens]
 
     def make_exit(self, user_msg: str) -> bool:
         """Return true if the user wants to exit the chatbot.
@@ -73,23 +76,34 @@ class ChatBot:
             bow_user_msg, bow_response) for bow_response in processed_responses]
         return self.responses[similarity_list.index(max(similarity_list))]
 
-    def find_entities(self, user_msg: str) -> str:
+    def find_entities(self, user_msg: str) -> List[Tuple[str, str]]:
         """Return a list of entities in the user message."""
+
         tagged_user_msg = nltk_pos_tag(user_msg.split())
         logging.debug("tagged_user_msg: [%s]", tagged_user_msg)
 
-        msg_nouns = [word for word,
-                     tag in tagged_user_msg if tag == "NNP"]  # NNP: Proper noun, singular
-        logging.debug("msg_nouns: [%s]", msg_nouns)
+        entities = []
 
-        tokens = self.word2vec(" ".join(msg_nouns))
-        category = self.word2vec("city")
+        for category, pos_tag in self.categories:
+            logging.debug("category: [%s]", category)
+            logging.debug("pos_tag: [%s]", pos_tag)
 
-        word2vec_result = self.__compute_similarity(tokens, category)
-        word2vec_result.sort(key=lambda x: x[2], reverse=True)
-        logging.debug("word2vec_result: [%s]", word2vec_result)
+            matching_tokens = [token for token,
+                               tag in tagged_user_msg if tag == pos_tag]
+            logging.debug("matching_tokens: [%s]", matching_tokens)
 
-        return word2vec_result[0][0]
+            token_docs = self.word2vec(" ".join(matching_tokens))
+            category_doc = self.word2vec(category)
+
+            word2vec_result = self.__compute_similarity(
+                token_docs, category_doc)
+            word2vec_result.sort(key=lambda x: x[1], reverse=True)
+            logging.debug("word2vec_result: %s", word2vec_result)
+
+            best_match = word2vec_result[0]
+            entities.append((category, best_match[0]))
+
+        return entities
 
     def respond(self, user_msg: str) -> str:
         """Return a response to the user message."""
@@ -97,8 +111,9 @@ class ChatBot:
             return "Bye!"
         else:
             best_response = self.find_intent_match(user_msg)
-            entity = self.find_entities(user_msg)
-            return best_response.format(entity, "", "")
+            entities = self.find_entities(user_msg)
+            # TODO: Find a better way to do this.
+            return best_response.format(*[entity[1] for entity in entities])
 
 
 if __name__ == "__main__":
@@ -120,7 +135,8 @@ if __name__ == "__main__":
         with open(responses_file, "r") as f:
             responses = f.read().splitlines()
 
-    bot = ChatBot(responses)
+    bot = ChatBot(responses=responses, categories=[
+                  ("city", "NNP"), ("budget", "CD")])  # NNP: Proper noun, singular; CD: Cardinal number
     while True:
         user_msg = input("Enter your message: ")
         print(bot.respond(user_msg))
