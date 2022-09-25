@@ -9,7 +9,7 @@ pip3 install -r requirements.txt
 
 ## CLI
 ```
-python3 cli/chatbot.py
+python3 cli/chatbot.py responses.txt
 ```
 
 ## Run tests
