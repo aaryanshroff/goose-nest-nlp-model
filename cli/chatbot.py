@@ -13,6 +13,11 @@ from nltk.corpus import stopwords as nltk_stopwords
 from typing import List, Tuple
 
 
+class EntityNotFoundError(Exception):
+    """Raised when an entity is not found in the user input."""
+    pass
+
+
 class ChatBot:
     # Signals to the chatbot that the user wants to exit the conversation.
     exit_commands = ("quit", "pause", "exit", "goodbye", "bye", "later")
@@ -92,7 +97,11 @@ class ChatBot:
 
             matching_tokens = [token for token,
                                tag in tagged_user_msg if tag == pos_tag]
+
             logging.debug("matching_tokens: [%s]", matching_tokens)
+
+            if not matching_tokens:
+                raise EntityNotFoundError
 
             token_docs = self.word2vec(" ".join(matching_tokens))
             category_doc = self.word2vec(category)
@@ -112,10 +121,14 @@ class ChatBot:
         if self.make_exit(user_msg):
             return "Bye!"
         else:
-            best_response = self.find_intent_match(user_msg)
-            entities = self.find_entities(user_msg)
-            # TODO: Find a better way to do this.
-            return best_response.format(*[entity[1] for entity in entities])
+            try:
+                best_response = self.find_intent_match(user_msg)
+                entities = self.find_entities(user_msg)
+                # TODO: Find a better way to do this.
+                return best_response.format(*[entity[1] for entity in entities])
+            except EntityNotFoundError:
+                logging.error(f"Entity not found in {user_msg}.")
+                return "Sorry, I didn't understand."
 
 
 if __name__ == "__main__":
