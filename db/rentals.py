@@ -19,7 +19,8 @@ class Rentals:
         :return: A list of rental items.
         """
         try:
-            response = cls.table.scan()
+            response = cls.table.query(
+                KeyConditionExpression=Key("City").eq(city))
         except ClientError as e:
             logger.error(
                 f"Couldn't query for cities in {city}. Here's why: {e.response['Error']['Code']}: {e.response['Error']['Message']}"
@@ -36,4 +37,4 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
-    logger.info(Rentals.query("Toronto"))
+    logger.info(Rentals.query("Kitchener"))
