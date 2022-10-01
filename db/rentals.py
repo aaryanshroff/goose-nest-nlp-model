@@ -11,16 +11,17 @@ class Rentals:
     table = dyn_resource.Table("ScraperHistory")
 
     @classmethod
-    def query(cls, city):
+    def query(cls, city, budget=None):
         """
         Queries for rentals in the specified city.
 
         :param city: The city to query for.
+        :param budget: The maximum budget to query for.
         :return: A list of rental items.
         """
         try:
             response = cls.table.query(
-                KeyConditionExpression=Key("City").eq(city))
+                KeyConditionExpression=Key("City").eq(city), FilterExpression=Key("Price").lt(budget))
         except ClientError as e:
             logger.error(
                 f"Couldn't query for cities in {city}. Here's why: {e.response['Error']['Code']}: {e.response['Error']['Message']}"
@@ -37,4 +38,4 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
-    logger.info(Rentals.query("Kitchener"))
+    logger.info(Rentals.query("Kitchener", 1000))

@@ -3,7 +3,6 @@ A command line interface to run the chatbot locally.
 """
 import logging
 import re
-import sys
 import spacy
 from spacy.tokens import Doc as SpacyDoc
 from collections import Counter
@@ -129,31 +128,3 @@ class ChatBot:
             except EntityNotFoundError:
                 logging.error(f"Entity not found in {user_msg}.")
                 return "Sorry, I didn't understand."
-
-
-if __name__ == "__main__":
-    # Doctest
-    import doctest
-    doctest.testmod()
-    ###
-
-    # Logging
-    import logging
-    logging.basicConfig(filename="chatbot.log", level=logging.DEBUG)
-    ###
-
-    responses = []
-
-    # optional command line argument to load responses from a file
-    if len(sys.argv) > 1:
-        responses_file = sys.argv[1]
-        with open(responses_file, "r") as f:
-            responses = f.read().splitlines()
-
-    bot = ChatBot(responses=responses, categories=[
-                  ("city", "NNP"), ("budget", "CD")])  # NNP: Proper noun, singular; CD: Cardinal number
-    while True:
-        user_msg = input("Enter your message: ")
-        print(bot.respond(user_msg))
-        if bot.make_exit(user_msg):
-            break
