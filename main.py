@@ -1,7 +1,6 @@
 import logging
 import sys
 
-from langcodes import best_match
 from cli.chatbot import ChatBot, EntityNotFoundError
 from db.rentals import Rentals
 
