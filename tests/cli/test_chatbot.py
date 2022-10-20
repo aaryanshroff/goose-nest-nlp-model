@@ -1,4 +1,4 @@
-import cli.chatbot
+import src.cli as cli
 import logging
 
 

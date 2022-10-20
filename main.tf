@@ -13,7 +13,7 @@ provider "aws" {
 
 data "archive_file" "housing-bot" {
   type        = "zip"
-  source_file = "lambda/lambda_function.py"
+  source_dir  = "src"
   output_path = "housing-bot.zip"
 }
 
