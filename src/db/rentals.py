@@ -1,7 +1,12 @@
+import logging
+import sys
 import boto3
 from boto3 import dynamodb
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class Rentals:
@@ -32,10 +37,4 @@ class Rentals:
 
 
 if __name__ == "__main__":
-    import logging
-    import sys
-
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-    logger = logging.getLogger(__name__)
-
     logger.info(Rentals.query("Kitchener", 1000))
