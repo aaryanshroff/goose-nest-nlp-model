@@ -79,6 +79,26 @@ resource "aws_iam_role" "iam_for_lambda" {
   ]
 }
 
+resource "aws_iam_policy" "dynamo_db_for_lambda" {
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "dynamodb:GetItem",
+          "dynamodb:Scan",
+          "dynamodb:Query",
+          "dynamodb:BatchGetItem",
+        ],
+        "Resource" : [
+          "arn:aws:dynamodb:${var.region}:${local.account_id}:table/ScraperHistory"
+        ],
+        "Effect" : "Allow"
+      }
+    ]
+  })
+}
+
 resource "aws_lambda_function" "housing-bot" {
   depends_on = [
     null_resource.ecr_image
@@ -88,6 +108,12 @@ resource "aws_lambda_function" "housing-bot" {
   role          = aws_iam_role.iam_for_lambda.arn
   memory_size   = 256
   package_type  = "Image"
+
+  environment {
+    variables = {
+      "NLTK_DATA" = "/var/task/nltk_data"
+    }
+  }
 }
 
 resource "aws_lambda_function_url" "housing_bot_latest" {
