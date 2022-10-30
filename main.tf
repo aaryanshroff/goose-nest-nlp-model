@@ -90,7 +90,7 @@ resource "aws_lambda_function" "housing-bot" {
   package_type  = "Image"
 }
 
-resource "aws_lambda_function_url" "messenger_housing_bot_latest" {
+resource "aws_lambda_function_url" "housing_bot_latest" {
   function_name      = aws_lambda_function.housing-bot.function_name
   authorization_type = "NONE"
 }
