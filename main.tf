@@ -91,6 +91,6 @@ resource "aws_lambda_function" "housing-bot" {
 }
 
 resource "aws_lambda_function_url" "messenger_housing_bot_latest" {
-  function_name      = aws_lambda_function.messenger_housing_bot.function_name
+  function_name      = aws_lambda_function.housing-bot.function_name
   authorization_type = "NONE"
 }
