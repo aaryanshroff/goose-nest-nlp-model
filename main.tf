@@ -76,6 +76,7 @@ resource "aws_iam_role" "iam_for_lambda" {
 
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    aws_iam_policy.dynamo_db_for_lambda.arn
   ]
 }
 
