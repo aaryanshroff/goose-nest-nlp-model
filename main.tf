@@ -76,7 +76,8 @@ resource "aws_iam_role" "iam_for_lambda" {
 
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-    aws_iam_policy.dynamo_db_for_lambda.arn
+    aws_iam_policy.dynamo_db_for_lambda.arn,
+    aws_iam_policy.sns_for_lambda.arn
   ]
 }
 
@@ -100,6 +101,33 @@ resource "aws_iam_policy" "dynamo_db_for_lambda" {
   })
 }
 
+resource "aws_iam_policy" "sns_for_lambda" {
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "sns:Publish"
+        ],
+        "Resource" : [
+          "arn:aws:sns:${var.region}:${local.account_id}:MessengerHousingBot"
+        ],
+        "Effect" : "Allow"
+      }
+    ]
+  })
+}
+
+resource "aws_sns_topic" "housing_bot_sns_topic" {
+  name = "housing_bot_sns_topic"
+}
+
+resource "aws_sns_topic_subscription" "housing_bot_sns_topic_subscription" {
+  topic_arn = aws_sns_topic.housing_bot_sns_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.housing-bot.arn
+}
+
 resource "aws_lambda_function" "housing-bot" {
   depends_on = [
     null_resource.ecr_image
@@ -112,7 +140,8 @@ resource "aws_lambda_function" "housing-bot" {
 
   environment {
     variables = {
-      "NLTK_DATA" = "/var/task/nltk_data"
+      "NLTK_DATA"     = "/var/task/nltk_data",
+      "SNS_TOPIC_ARN" = "arn:aws:sns:${var.region}:${local.account_id}:MessengerHousingBot"
     }
   }
 }
