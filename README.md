@@ -1,5 +1,9 @@
 # NLP Housing Bot
 
+## Related Repos
+[Go Lambda Scraper](https://github.com/aaryanshroff/go-lambda-scraper)
+[Messenger Webhook](https://github.com/aaryanshroff/rentals-bot-messenger-webhook)
+
 ## Install
 ```
 python3 -m venv .venv
