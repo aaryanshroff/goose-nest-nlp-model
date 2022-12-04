@@ -3,12 +3,12 @@ import os
 
 import boto3
 
-from main import HousingBot
+from main import GooseNest
 
 
 def lambda_handler(event, context):
     message = json.loads(event['Records'][0]['Sns']['Message'])
-    bot = HousingBot(responses=[], categories=[
+    bot = GooseNest(responses=[], categories=[
         ("city", "NNP"), ("budget", "CD")])  # NNP: Proper noun, singular; CD: Cardinal number
     body = bot.respond(message['Body'])
     sns = boto3.client('sns')

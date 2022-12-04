@@ -5,7 +5,7 @@ from cli.chatbot import ChatBot, EntityNotFoundError
 from db.rentals import Rentals
 
 
-class HousingBot(ChatBot):
+class GooseNest(ChatBot):
     def respond(self, user_msg: str) -> str:
         """Return a response to the user message."""
         if self.make_exit(user_msg):
@@ -48,7 +48,7 @@ if __name__ == "__main__":
         with open(responses_file, "r") as f:
             responses = f.read().splitlines()
 
-    bot = HousingBot(responses=responses, categories=[
+    bot = GooseNest(responses=responses, categories=[
         ("city", "NNP"), ("budget", "CD")])  # NNP: Proper noun, singular; CD: Cardinal number
     while True:
         user_msg = input("Enter your message: ")
