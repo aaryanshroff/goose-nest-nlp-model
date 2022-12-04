@@ -1,4 +1,4 @@
-# NLP Housing Bot
+# Goose Nest NLP Model
 
 ## Related Repos
 [Go Lambda Scraper](https://github.com/aaryanshroff/go-lambda-scraper)
