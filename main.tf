@@ -20,7 +20,7 @@ data "aws_caller_identity" "current" {}
 
 locals {
   account_id          = data.aws_caller_identity.current.account_id
-  ecr_repository_name = "housing-bot-ecr-repository"
+  ecr_repository_name = "goose_nest_nlp_model_ecr_repository"
   ecr_image_tag       = "latest"
   src_dir             = "src"
 }
@@ -57,7 +57,7 @@ data "aws_ecr_image" "lambda_image" {
   image_tag       = local.ecr_image_tag
 }
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_housing_bot_lambda"
+  name = "iam_for_goose_nest_nlp_model_lambda"
 
   assume_role_policy = jsonencode(
     {
@@ -118,21 +118,21 @@ resource "aws_iam_policy" "sns_for_lambda" {
   })
 }
 
-resource "aws_sns_topic" "housing_bot_sns_topic" {
-  name = "housing_bot_sns_topic"
+resource "aws_sns_topic" "goose_nest_nlp_model_sns_topic" {
+  name = "goose_nest_nlp_model_sns_topic"
 }
 
-resource "aws_sns_topic_subscription" "housing_bot_sns_topic_subscription" {
-  topic_arn = aws_sns_topic.housing_bot_sns_topic.arn
+resource "aws_sns_topic_subscription" "goose_nest_nlp_model_sns_topic_subscription" {
+  topic_arn = aws_sns_topic.goose_nest_nlp_model_sns_topic.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.housing-bot.arn
+  endpoint  = aws_lambda_function.goose_nest_nlp_model
 }
 
-resource "aws_lambda_function" "housing-bot" {
+resource "aws_lambda_function" "goose_nest_nlp_model" {
   depends_on = [
     null_resource.ecr_image
   ]
-  function_name = "HousingBot"
+  function_name = "GooseNestNLPModel"
   image_uri     = "${aws_ecr_repository.repo.repository_url}@${data.aws_ecr_image.lambda_image.id}"
   role          = aws_iam_role.iam_for_lambda.arn
   memory_size   = 256
@@ -146,7 +146,7 @@ resource "aws_lambda_function" "housing-bot" {
   }
 }
 
-resource "aws_lambda_function_url" "housing_bot_latest" {
-  function_name      = aws_lambda_function.housing-bot.function_name
+resource "aws_lambda_function_url" "goose_nest_nlp_model_lambda_function_url" {
+  function_name      = aws_lambda_function.goose_nest_nlp_model.function_name
   authorization_type = "NONE"
 }
