@@ -1,4 +1,4 @@
-name: Python Test, Terraform Apply, Docker Build and Deploy to AWS Lambda
+name: Python Test and Deploy to AWS Lambda
 
 on: [push]
 
