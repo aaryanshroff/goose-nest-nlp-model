@@ -1,6 +1,9 @@
 name: Python Test and Deploy to AWS Lambda
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   test:
