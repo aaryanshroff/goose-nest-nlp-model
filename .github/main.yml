@@ -1,0 +1,36 @@
+name: Python Test, Terraform Apply, Docker Build and Deploy to AWS Lambda
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install -r requirements.txt
+    - name: Run pytest
+      run: |
+        python -m pytest
+    - name: Run terraform apply
+      run: |
+        terraform init
+        terraform apply -auto-approve
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Docker image
+      run: |
+        docker build -t goose-nest-nlp-model-image .
+    - name: Deploy to AWS Lambda
+      run: |
+        $(aws ecr get-login --no-include-email --region us-east-1)
+        docker tag goose-nest-nlp-model-image:latest
