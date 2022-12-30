@@ -1,9 +1,9 @@
-import src.cli as cli
+import src.cli.chatbot.ChatBot as ChatBot
 import logging
 
 
 def test_make_exit():
-    c = cli.chatbot.ChatBot()
+    c = ChatBot()
     assert c.make_exit("I want to quit") == True
     assert c.make_exit("Bye!") == True
     assert c.make_exit("Pause") == True
@@ -12,7 +12,7 @@ def test_make_exit():
 
 
 def test_find_intent_match():
-    c1 = cli.chatbot.ChatBot()
+    c1 = ChatBot()
     assert c1.find_intent_match("Hello!") == ""
     c2 = cli.chatbot.ChatBot(["Hello!", "What do you need help with?"])
     assert c2.find_intent_match("Hello, how are you?") == "Hello!"
@@ -21,7 +21,7 @@ def test_find_intent_match():
 
 
 def test_find_entities():
-    c = cli.chatbot.ChatBot(categories=[
+    c = ChatBot(categories=[
         ("city", "NNP"), ("budget", "CD")])
 
     # TODO: Fix failing test
