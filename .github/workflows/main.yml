@@ -17,6 +17,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -r requirements.txt
+    - name: Install nltk corpus
+      run: |
+        python3 -m nltk.downloader stopwords averaged_perceptron_tagger -d "nltk_data"
     - name: Run pytest
       run: |
         python -m pytest
