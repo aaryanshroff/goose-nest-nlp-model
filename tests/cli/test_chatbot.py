@@ -1,7 +1,7 @@
 import sys
-sys.path.append("../../src/")
+sys.path.append("../../src/cli")
 
-import src.cli.chatbot.ChatBot as ChatBot
+from src.cli.chatbot import ChatBot
 import logging
 
 
@@ -17,11 +17,10 @@ def test_make_exit():
 def test_find_intent_match():
     c1 = ChatBot()
     assert c1.find_intent_match("Hello!") == ""
-    c2 = cli.chatbot.ChatBot(["Hello!", "What do you need help with?"])
+    c2 = ChatBot(["Hello!", "What do you need help with?"])
     assert c2.find_intent_match("Hello, how are you?") == "Hello!"
     assert c2.find_intent_match(
         "I need help.") == "What do you need help with?"
-
 
 def test_find_entities():
     c = ChatBot(categories=[
